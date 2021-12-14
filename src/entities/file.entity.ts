@@ -1,5 +1,7 @@
 import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
 import { User } from './user.entity'
+import { Storage } from './storage.entity'
+import { Folder } from './folder.entity'
 
 @Entity()
 export class File extends BaseEntity{
