@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
+import {BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from 'typeorm'
 import { User } from './user.entity'
 import { Storage } from './storage.entity'
 import { Folder } from './folder.entity'
@@ -26,7 +26,7 @@ export class File extends BaseEntity{
     @Column({ type: 'date' })
     updated_at: string
 
-    @ManyToOne(() => Storage)
+    @ManyToMany(() => Storage)
     storage_id: Storage
 
     @ManyToOne(() => Folder)
