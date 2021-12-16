@@ -14,7 +14,7 @@ export class FileSecret extends BaseEntity{
     owner: User
 
     @ManyToOne( () => File)
-    file_id: File
+    file: File
 
     
 } 

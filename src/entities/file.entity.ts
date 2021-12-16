@@ -26,10 +26,10 @@ export class File extends BaseEntity{
     @Column({ type: 'date' })
     updated_at: string
 
-    @ManyToMany(() => Storage)
-    storage_id: Storage
+    @ManyToOne(() => Storage)
+    storage: Storage
 
     @ManyToOne(() => Folder)
-    foldr_id: Folder
+    folder: Folder
 
 } 
