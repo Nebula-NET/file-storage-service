@@ -52,7 +52,7 @@ async function main(){
             bodyParser.json(),
             bodyParser.urlencoded({extended : false}),
             morgan(':method :url :status - :response-time ms'),
-            checkLanguage
+            //checkLanguage
         ]
     })
     app.listen() 
