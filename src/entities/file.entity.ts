@@ -27,9 +27,9 @@ export class File extends BaseEntity{
     updated_at: string
 
     @ManyToMany(() => Storage)
-    storage_id: Storage
+    storage: Storage
 
     @ManyToOne(() => Folder)
-    foldr_id: Folder
+    folder: Folder
 
 } 
