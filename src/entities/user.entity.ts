@@ -7,11 +7,11 @@ export class User extends BaseEntity{
     id: number
 
     @Column({nullable: false})
-    public_key: number
+    public_key: string
 
-    @Column({nullable: true})
+    @Column({nullable: false, default: '1073741824'}) // 1 GIG
     storage_limit: string
 
-    @Column({nullable: false})
+    @Column({nullable: false, default: '0'})
     storage_used: string
 } 
