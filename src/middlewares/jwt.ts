@@ -7,12 +7,14 @@ import { AuthService } from './../services/authService';
 
 export async function verifyUser(req : Request , res : Response , next:NextFunction){
     try {
-        let token = req.headers['authorization']
-        let deviceId: string|any = req.headers['device-id'];
-        let publickey: string|any = req.headers['publickey'];
+        const token = req.headers['authorization']
+        const deviceId: string|any = req.headers['device-id'];
+        const publickey: string|any = req.headers['publickey'];
+        const platformVersion : string|any = req.headers['platform-version'];
+        const lang : string|any = req.headers['accept-language'];
 
         const authService = new AuthService();
-        let result:IResponse = await authService.checkToken(token, publickey, deviceId).then((result: any) => result.data);
+        let result:IResponse = await authService.checkToken(token, publickey, deviceId, lang, platformVersion).then((result: any) => result.data);
         req.headers['user-email'] = result.data.email
         next();
     } catch (err) {        

@@ -16,12 +16,23 @@ export class AuthService{
         })
     }
 
-    public async checkToken(token: string, publickey: string, deviceId: string){
+    public async checkToken(
+        token: string,
+        publickey: string,
+        deviceId: string,
+        acceptLanguage: string,
+        platformVersion: string
+    ){
         return new Promise((resolve, reject)=>{
             this.api.post('/authorization/check-token', {
                 token,
                 publickey,
                 device_id: deviceId
+            }, {
+                headers: {
+                    'Accept-Language': acceptLanguage,
+                    'Platform-Version': platformVersion,
+                }
             })
             .then((result) => {
                 resolve(result)
