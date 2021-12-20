@@ -47,10 +47,14 @@ export class UserController{
         let folder: Folder ;
 
         try {
+            ///////////// check duplicate folder in the same level
             let check = await this.folderServcie.checkfolder(data.name , data.parent , data.id)
             if(check){
+                ///////////find user base on id
                 const userService = new UserService()
                 let user = await userService.findById(data.id)
+
+                ////////// create folder
                 folder = await this.folderServcie.create(data.name, data.parent , user );
                 const response: IResponse = {
                     success: true,
@@ -59,6 +63,7 @@ export class UserController{
                 }
                 res.status(200).json(response)
             }else{
+                ////////// response on finding duplicate folder
                 const response: IResponse = {
                     success: false,
                     message: 'یک پوشه با این نام وجود دارد',
