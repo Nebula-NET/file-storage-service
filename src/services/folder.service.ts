@@ -1,6 +1,7 @@
 import { Folder } from "./../entities/folder.entity";
 import { User } from "./../entities/user.entity";
 import { getRepository } from "typeorm";
+import { isEmpty } from "lodash";
 
 
 export class FolderService{
@@ -30,6 +31,16 @@ export class FolderService{
         folder.owner = user 
         await folder.save();
         return folder
+    }
+
+    public async checkfolder(name: string , parent: number , userId : number ):Promise<Boolean>{
+        let folder : Folder[] = await this.folderRepository.find({ where: { owner: userId , parent : parent , name :name }})
+
+        if ( folder.length == 0)
+            return true
+
+        return false
+
     }
 
 
