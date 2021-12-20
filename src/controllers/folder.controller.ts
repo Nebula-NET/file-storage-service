@@ -43,25 +43,31 @@ export class UserController{
 			return;
 		}
 
-        const userService = new UserService()
-        let user = userService.findById(data.id)
 
         let folder: Folder ;
 
         try {
-
-            folder = await this.folderServcie.findByPublickey(data.publickey);
-            if(!user){
-                user = await this.userServcie.create(data.publickey);
+            let check = await this.folderServcie.checkfolder(data.name , data.parent , data.id)
+            if(check){
+                const userService = new UserService()
+                let user = await userService.findById(data.id)
+                folder = await this.folderServcie.create(data.name, data.parent , user );
+                const response: IResponse = {
+                    success: true,
+                    message: '',
+                    data: folder
+                }
+                res.status(200).json(response)
+            }else{
+                const response: IResponse = {
+                    success: false,
+                    message: 'یک پوشه با این نام وجود دارد',
+                    data: ''
+                }
+                res.status(409).json(response)
             }
 
-            const response: IResponse = {
-                success: true,
-                message: '',
-                data: user
-            }
-
-            res.status(200).json(response)
+           
             
         } catch (error) {
             HandleError(res, error)
