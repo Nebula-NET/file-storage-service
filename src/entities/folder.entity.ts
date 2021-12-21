@@ -6,7 +6,7 @@ export class Folder extends BaseEntity{
     @PrimaryGeneratedColumn('increment') 
     id: number
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User , {nullable: false})
     owner: User
 
     @Column({nullable: false})
