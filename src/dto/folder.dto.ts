@@ -5,6 +5,7 @@ export class createFolderDTO{
     constructor(data:any){
         this.name = data.name;
         this.parent = data.parent
+        this.id = data.id
 
     }
 
