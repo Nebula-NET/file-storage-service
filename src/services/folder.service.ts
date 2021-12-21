@@ -24,7 +24,7 @@ export class FolderService{
         return folder
     }
 
-    public async create(name: string , parent: number , user : User):Promise<Folder>{
+    public async create(name: string , parent: number | null , user : User):Promise<Folder>{
         let folder: Folder = new Folder();
         folder.name = name;
         folder.parent = parent
