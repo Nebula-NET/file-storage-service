@@ -1,8 +1,10 @@
 import { getUserDTO } from './../dto/user.dto';
 import { User } from './../entities/user.entity';
+import { Folder } from './../entities/folder.entity';
 import {Router, Request, Response} from 'express'
 import { HandleError } from './../handlesErrors/handleError';
 import { UserService } from './../services/user.service';
+import { FolderService } from './../services/folder.service';
 import { IResponse } from 'interfaces/response.interface';
 
 
@@ -12,11 +14,13 @@ export class UserController{
 	public router = Router();
 
     private userServcie:UserService;
+    private folderService : FolderService
 
 
     constructor(){
         this.initalRoute()
         this.userServcie = new UserService()
+        this.folderService = new FolderService()
     }
 
 
@@ -41,11 +45,13 @@ export class UserController{
 		}
 
         let user: User ;
+        
 
         try {
             user = await this.userServcie.findByPublickey(data.publickey);
             if(!user){
                 user = await this.userServcie.create(data.publickey);
+                this.folderService.create("root" , null , user)
             }
 
             const response: IResponse = {
