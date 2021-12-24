@@ -13,23 +13,26 @@ export class FolderController{
     public path: String = "/file-storage/folder";
 	public router = Router();
 
+    private userServcie:UserService;
     private folderServcie:FolderService;
 
 
     constructor(){
         this.initalRoute()
         this.folderServcie = new FolderService()
+        this.userServcie = new UserService()
     }
 
 
     private initalRoute(){
-        this.router.post('/:id/:name-:parent', (req, res) => this.creatfolder(req, res))
-        this.router.get('/:id', (req, res) => this.getfolder(req, res))
+        this.router.post('/:name-:parent', (req, res) => this.creatfolder(req, res))
+        this.router.get('/', (req, res) => this.getfolder(req, res))
     }
 
 
     public async creatfolder(req: Request, res: Response){
         let data = new createFolderDTO(req.params);
+        const publickey: string|any = req.headers['publickey'];
 
         //validate request body
         try {
@@ -45,19 +48,17 @@ export class FolderController{
 
 
         let folder: Folder ;
+        let user: User ;
 
         try {
             ///////////// check duplicate folder in the same level
-            let check = await this.folderServcie.checkfolder(data.name , data.parent , data.id)
+            user = await this.userServcie.findByPublickey(publickey);
+            let check = await this.folderServcie.checkfolder(data.name , data.parent , user.id )
             if(check){
                 ///////////find user base on id
                 const userService = new UserService()
-                let user = await userService.findById(data.id)
 
                 ////////// create folder
-                console.log(data.name)
-                console.log(data.parent)
-                console.log(data.id)
                 folder = await this.folderServcie.create(data.name, data.parent , user );
                 const response: IResponse = {
                     success: true,
@@ -83,6 +84,6 @@ export class FolderController{
     }
 
     public async getfolder(req : Request, res: Response){
-        res.status(200).json(req.params.id)
-    }   
+
+    }
 }
