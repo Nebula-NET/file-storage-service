@@ -14,9 +14,6 @@ export class createFolderDTO{
     @IsNotEmpty({message: 'parent can not be empty'})
     parent: number;
 
-    @IsNotEmpty({message: 'id can not be empty'})
-    id: number;
-
     public async validate():Promise<IResponse | null>{
         let errors = await validate(this);            
         if(errors.length > 0){

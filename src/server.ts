@@ -8,6 +8,7 @@ import { checkLanguage } from './middlewares/checkLang';
 import { checkDeviceId } from './middlewares/checkDeviceId';
 import { verifyUser } from './middlewares/jwt';
 import { UserController } from './controllers/user.controller';
+import { FolderController } from './controllers/folder.controller';
 
 
 require('dotenv').config()
@@ -36,7 +37,8 @@ async function main(){
     const app = new App({
         port: process.env.PORT ? parseInt(process.env.PORT) : 5000,
         controllers: [
-            new UserController()
+            new UserController(),
+            new FolderController()
         ],
         middleWares: [
             cors(),
