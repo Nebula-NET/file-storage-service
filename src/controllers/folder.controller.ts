@@ -85,5 +85,24 @@ export class FolderController{
 
     public async getfolder(req : Request, res: Response){
 
+        const publickey: string|any = req.headers['publickey'];
+
+        let user: User ;
+        
+
+        try {
+
+            user = await this.userServcie.findByPublickey(publickey);
+            let folders : Folder[] = await this.folderServcie.findByUser(user.id)
+            const response: IResponse = {
+                success: true,
+                message: '',
+                data: folders
+            }
+            res.status(200).json(response)
+            
+        } catch (error) {
+            HandleError(res, error)
+        }
     }
 }
