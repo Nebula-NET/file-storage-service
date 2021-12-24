@@ -19,8 +19,8 @@ export class FolderService{
         return folder
     }
 
-    public async findByUser(userId: number):Promise<Folder[] | null>{
-        let folder:Folder[] = await this.folderRepository.find({ where: { owner: userId }});
+    public async findByParentFolder(userId: number , parent: number):Promise<Folder[] | null>{
+        let folder:Folder[] = await this.folderRepository.find({ where: { owner: userId , parent : parent }});
         return folder
     }
 
