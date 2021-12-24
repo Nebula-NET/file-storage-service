@@ -108,7 +108,7 @@ export class FolderController{
                 const response: IResponse = {
                     success: true,
                     message: 'پوشه وجود ندارد',
-                    data: 
+                    data: ''
                 }
                 res.status(404).json(response)
             }
