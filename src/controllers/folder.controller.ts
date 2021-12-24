@@ -26,7 +26,7 @@ export class FolderController{
 
     private initalRoute(){
         this.router.post('/:name-:parent', (req, res) => this.creatfolder(req, res))
-        this.router.get('/', (req, res) => this.getfolder(req, res))
+        this.router.get('/:parent_id', (req, res) => this.getfolder(req, res))
     }
 
 
@@ -84,8 +84,9 @@ export class FolderController{
     }
 
     public async getfolder(req : Request, res: Response){
-
+        let parentId : string = req.params.parent_id
         const publickey: string|any = req.headers['publickey'];
+       
 
         let user: User ;
         
@@ -93,7 +94,7 @@ export class FolderController{
         try {
 
             user = await this.userServcie.findByPublickey(publickey);
-            let folders : Folder[] = await this.folderServcie.findByUser(user.id)
+            let folders : Folder[] = await this.folderServcie.findByParentFolder(user.id , Number(parentId) )
             const response: IResponse = {
                 success: true,
                 message: '',
