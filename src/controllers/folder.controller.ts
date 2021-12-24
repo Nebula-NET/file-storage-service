@@ -25,7 +25,7 @@ export class FolderController{
 
 
     private initalRoute(){
-        this.router.post('/:name-:parent', (req, res) => this.creatfolder(req, res))
+        this.router.post('/:parent/:name', (req, res) => this.creatfolder(req, res))
         this.router.get('/:parent_id', (req, res) => this.getfolder(req, res))
     }
 
@@ -92,15 +92,26 @@ export class FolderController{
         
 
         try {
+            let folder : Folder = await this.folderServcie.findById(Number(parentId))
 
-            user = await this.userServcie.findByPublickey(publickey);
-            let folders : Folder[] = await this.folderServcie.findByParentFolder(user.id , Number(parentId) )
-            const response: IResponse = {
-                success: true,
-                message: '',
-                data: folders
+            if(folder){
+                user = await this.userServcie.findByPublickey(publickey);
+                let folders : Folder[] = await this.folderServcie.findByParentFolder(user.id , Number(parentId) )
+                const response: IResponse = {
+                    success: true,
+                    message: '',
+                    data: folders
+                }
+                res.status(200).json(response)
+            }   
+            else{
+                const response: IResponse = {
+                    success: true,
+                    message: 'پوشه وجود ندارد',
+                    data: 
+                }
+                res.status(404).json(response)
             }
-            res.status(200).json(response)
             
         } catch (error) {
             HandleError(res, error)
