@@ -10,6 +10,7 @@ import { FolderService } from './../services/folder.service';
 import { UserService } from './../services/user.service';
 import { FileService } from './../services/file.service';
 import { IResponse } from './../interfaces/response.interface';
+import * as IPFS from 'ipfs-core'
 
 
 
@@ -93,10 +94,16 @@ export class FileController{
                 }else{
                     user = await this.userServcie.findByPublickey(publickey);
                     if(user){
-                        let cid : string = "dd"
+                        const ipfs = await IPFS.create()
+                        const { cid } = await ipfs.add(dataHeaders.file)
 
-                        file = await this.fileServcie.createFile(dataParams,dataHeaders,user,folder,storage,location)
-
+                        file = await this.fileServcie.createFile(dataParams,dataHeaders,user,folder,storage,cid.toString())
+                        const response: IResponse = {
+                            success: true,
+                            message: '',
+                            data: file
+                        }
+                        res.status(200).json(response)
                     }
                 }
             }
