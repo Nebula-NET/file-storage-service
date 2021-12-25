@@ -10,6 +10,7 @@ import { FolderService } from './../services/folder.service';
 import { UserService } from './../services/user.service';
 import { FileService } from './../services/file.service';
 import { StorageService } from './../services/storage.service';
+import { ipfsService } from './../services/ipfs.service';
 import { IResponse } from './../interfaces/response.interface';
 import * as IPFS from 'ipfs-core'
 
@@ -23,6 +24,7 @@ export class FileController{
     private folderServcie:FolderService;
     private fileServcie:FileService;
     private storageService:StorageService;
+    private ipfsService:ipfsService;
 
 
     constructor(){
@@ -31,6 +33,7 @@ export class FileController{
         this.userServcie = new UserService()
         this.fileServcie = new FileService()
         this.storageService = new StorageService()
+        this.ipfsService = new ipfsService()
     }
 
 
@@ -97,10 +100,9 @@ export class FileController{
                 }else{
                     user = await this.userServcie.findByPublickey(publickey);
                     if(user){
-                        const ipfs = await IPFS.create()
-                        const { cid } = await ipfs.add(dataHeaders.file)
+                        const location = await this.ipfsService.cidGenerate(dataHeaders.file)
 
-                        file = await this.fileServcie.createFile(dataParams,dataHeaders,user,folder,storage,cid.toString())
+                        file = await this.fileServcie.createFile(dataParams, dataHeaders, user, folder, storage, location)
                         const response: IResponse = {
                             success: true,
                             message: '',
