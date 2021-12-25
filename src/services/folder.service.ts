@@ -14,8 +14,8 @@ export class FolderService{
     }
 
 
-    public async findById(folderId: number):Promise<Folder | null>{
-        let folder:Folder = await this.folderRepository.findOne({id: folderId});
+    public async findById(folderId: number , user : User):Promise<Folder | null>{
+        let folder:Folder = await this.folderRepository.findOne({id: folderId , owner : user});
         return folder
     }
 
