@@ -1,5 +1,4 @@
 import { Folder } from "./../entities/folder.entity";
-import { User } from "./../entities/user.entity";
 import { File } from "./../entities/file.entity";
 import { Storage } from "./../entities/storage.entity";
 import { FileSecret } from "./../entities/fileSecret.entity";
@@ -23,12 +22,12 @@ export class FileService{
         return file
     }
 
-    public async findByFolder(folderId: number , userId : number):Promise<File[] | null>{
-        let file:File[] = await this.fileRepository.find({ where: { owner: userId , folder : folderId }});
+    public async findByFolder(folderId: number ):Promise<File[] | null>{
+        let file:File[] = await this.fileRepository.find({ where: { folder : folderId }});
         return file
     }
 
-    public async createFile(dataParams : createFileDTOParams , dataHeaders : createFileDTOHeaders , user : User , folder : Folder , storage : Storage , location : string):Promise<File>{
+    public async createFile(dataParams : createFileDTOParams , dataHeaders : createFileDTOHeaders  , folder : Folder , storage : Storage , location : string):Promise<File>{
         let file: File = new File();
         file.name = dataParams.name;
         file.size = dataParams.size 
@@ -36,15 +35,14 @@ export class FileService{
 
         file.location = location
         file.folder = folder
-        file.owner = user 
         file.storage = storage
 
         await file.save();
         return file
     }
 
-    public async checkFile(name: string , parent: number , userId : number ):Promise<Boolean>{
-        let file : File[] = await this.fileRepository.find({ where: { owner: userId , parent : parent , name :name }})
+    public async checkFile(name: string , parentId: number  ):Promise<Boolean>{
+        let file : File[] = await this.fileRepository.find({ where: { folder : parentId , name :name }})
 
         if ( file.length == 0)
             return true
@@ -53,6 +51,6 @@ export class FileService{
 
     }
 
-
+    
 
 }

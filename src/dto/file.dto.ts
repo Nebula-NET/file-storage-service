@@ -38,9 +38,10 @@ export class createFileDTOParams{
 
 export class createFileDTOHeaders{
     constructor(data:any){
-        this.created_at = data.name;
-        this.storage_id = data.size
+        this.created_at = data.created_at;
+        this.storage_id = data.storage_id
         this.file = data.file
+        this.secret = data.secret
     }
 
     @IsNotEmpty({message: 'created _at can not be empty'})
@@ -51,6 +52,9 @@ export class createFileDTOHeaders{
 
     @IsNotEmpty({message: 'file string can not be empty'})
     file: string;
+
+    @IsNotEmpty({message: 'secret can not be empty'})
+    secret: string;
 
     
 

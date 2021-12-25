@@ -8,9 +8,6 @@ export class File extends BaseEntity{
     @PrimaryGeneratedColumn('increment') 
     id: number
 
-    @ManyToOne(() => User)
-    owner: User
-
     @Column({nullable: false})
     name: string
 
@@ -23,7 +20,7 @@ export class File extends BaseEntity{
     @Column({ type: 'date' })
     created_at: string
 
-    @Column({ type: 'date' })
+    @Column({ type: 'date' , nullable : true })
     updated_at: string
 
     @ManyToOne(() => Storage)

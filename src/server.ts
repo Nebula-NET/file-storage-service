@@ -9,6 +9,7 @@ import { checkDeviceId } from './middlewares/checkDeviceId';
 import { verifyUser } from './middlewares/jwt';
 import { UserController } from './controllers/user.controller';
 import { FolderController } from './controllers/folder.controller';
+import { FileController } from './controllers/file.controller';
 
 
 require('dotenv').config()
@@ -38,7 +39,8 @@ async function main(){
         port: process.env.PORT ? parseInt(process.env.PORT) : 5000,
         controllers: [
             new UserController(),
-            new FolderController()
+            new FolderController(),
+            new FileController()
         ],
         middleWares: [
             cors(),
@@ -47,7 +49,7 @@ async function main(){
             morgan(':method :url :status - :response-time ms'),
             checkLanguage,
             checkDeviceId,
-            verifyUser
+            //verifyUser
         ]
     })
     app.listen() 
