@@ -1,7 +1,9 @@
-import { createFolderDTO } from './../dto/folder.dto';
+import { createFileDTOParams } from './../dto/file.dto';
+import { createFileDTOHeaders } from './../dto/file.dto';
 import { Folder } from './../entities/folder.entity';
 import { User } from './../entities/user.entity';
 import { File } from './../entities/file.entity';
+import { Storage } from './../entities/storage.entity';
 import {Router, Request, Response} from 'express'
 import { HandleError } from './../handlesErrors/handleError';
 import { FolderService } from './../services/folder.service';
@@ -17,29 +19,43 @@ export class FileController{
 
     private userServcie:UserService;
     private folderServcie:FolderService;
-    private fileServcie:FileSe;
+    private fileServcie:FileService;
 
 
     constructor(){
         this.initalRoute()
         this.folderServcie = new FolderService()
         this.userServcie = new UserService()
+        this.fileServcie = new FileService()
     }
 
 
     private initalRoute(){
-        this.router.post('/:name-:parent', (req, res) => this.creatfolder(req, res))
+        this.router.post('/:parent_id/file/:name-:size', (req, res) => this.creatFile(req, res))
         this.router.get('/', (req, res) => this.getfolder(req, res))
     }
 
 
-    public async creatfolder(req: Request, res: Response){
-        let data = new createFolderDTO(req.params);
+    public async creatFile(req: Request, res: Response){
+        let dataParams = new createFileDTOParams(req.params);
         const publickey: string|any = req.headers['publickey'];
+        let dataHeaders = new createFileDTOHeaders(req.headers)
+
 
         //validate request body
         try {
-			let error = await data.validate();
+			let error = await dataParams.validate();
+			if (error) {
+				res.status(400).json(error);
+				return;
+			}
+		} catch (error) {
+			HandleError(res, error)
+			return;
+		}
+        //validate request headers
+        try {
+			let error = await dataHeaders.validate();
 			if (error) {
 				res.status(400).json(error);
 				return;
@@ -52,31 +68,37 @@ export class FileController{
 
         let folder: Folder ;
         let user: User ;
+        let storage : Storage
+        let file : File;
 
         try {
-            ///////////// check duplicate folder in the same level
-            user = await this.userServcie.findByPublickey(publickey);
-            let check = await this.folderServcie.checkfolder(data.name , data.parent , user.id )
-            if(check){
-                ///////////find user base on id
-                const userService = new UserService()
-
-                ////////// create folder
-                folder = await this.folderServcie.create(data.name, data.parent , user );
-                const response: IResponse = {
-                    success: true,
-                    message: '',
-                    data: folder
-                }
-                res.status(200).json(response)
-            }else{
-                ////////// response on finding duplicate folder
+            ///////////// check Folder
+            folder = await this.folderServcie.findById(dataParams.parent_id)
+            if(!folder){
                 const response: IResponse = {
                     success: false,
-                    message: 'یک پوشه با این نام وجود دارد',
+                    message: 'folder not found',
                     data: ''
                 }
-                res.status(409).json(response)
+                res.status(404).json(response)
+            }else{
+                storage = await this.storageService.findById(dataHeaders.storage_id)
+                if(!storage){
+                    const response: IResponse = {
+                        success: false,
+                        message: 'storage not found',
+                        data: ''
+                    }
+                    res.status(404).json(response)
+                }else{
+                    user = await this.userServcie.findByPublickey(publickey);
+                    if(user){
+                        let cid : string = "dd"
+
+                        file = await this.fileServcie.createFile(dataParams,dataHeaders,user,folder,storage,location)
+
+                    }
+                }
             }
 
            
