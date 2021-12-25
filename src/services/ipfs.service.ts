@@ -3,7 +3,7 @@ import { isEmpty } from "lodash";
 import * as IPFS from 'ipfs-core'
 
 
-export class StorageService{
+export class ipfsService{
     constructor(){
 
     }
