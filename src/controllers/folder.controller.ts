@@ -6,6 +6,7 @@ import { HandleError } from './../handlesErrors/handleError';
 import { FolderService } from './../services/folder.service';
 import { UserService } from './../services/user.service';
 import { IResponse } from 'interfaces/response.interface';
+import { access } from 'fs';
 
 
 
@@ -51,26 +52,37 @@ export class FolderController{
         let user: User ;
 
         try {
-            ///////////// check duplicate folder in the same level
             user = await this.userServcie.findByPublickey(publickey);
-            let check = await this.folderServcie.checkfolder(data.name , data.parent , user.id )
-            if(check){
-                ////////// create folder
-                folder = await this.folderServcie.create(data.name, data.parent , user );
-                const response: IResponse = {
-                    success: true,
-                    message: '',
-                    data: folder
+
+            let folder_access : Folder = await this.folderServcie.findById(data.parent , user)
+            if(folder_access){
+            ///////////// check duplicate folder in the same level
+                let check = await this.folderServcie.checkfolder(data.name , data.parent , user.id )
+                if(check){
+                    ////////// create folder
+                    folder = await this.folderServcie.create(data.name, data.parent , user );
+                    const response: IResponse = {
+                        success: true,
+                        message: '',
+                        data: folder
+                    }
+                    res.status(200).json(response)
+                }else{
+                    ////////// response on finding duplicate folder
+                    const response: IResponse = {
+                        success: false,
+                        message: 'یک پوشه با این نام وجود دارد',
+                        data: ''
+                    }
+                    res.status(409).json(response)
                 }
-                res.status(200).json(response)
             }else{
-                ////////// response on finding duplicate folder
                 const response: IResponse = {
                     success: false,
-                    message: 'یک پوشه با این نام وجود دارد',
+                    message: 'شما به این پوشه دسترسی ندارید',
                     data: ''
                 }
-                res.status(409).json(response)
+                res.status(401).json(response)
             }
 
            
@@ -85,14 +97,14 @@ export class FolderController{
         const publickey: string|any = req.headers['publickey'];
        
 
-        let user: User ;
+        let user: User = await this.userServcie.findByPublickey(publickey);
         
 
         try {
-            let folder : Folder = await this.folderServcie.findById(Number(parentId))
+            let folder : Folder = await this.folderServcie.findById(Number(parentId),user)
 
             if(folder){
-                user = await this.userServcie.findByPublickey(publickey);
+                
                 let folders : Folder[] = await this.folderServcie.findByParentFolder(user.id , Number(parentId) )
                 const response: IResponse = {
                     success: true,
