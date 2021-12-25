@@ -38,8 +38,8 @@ export class createFileDTOParams{
 
 export class createFileDTOHeaders{
     constructor(data:any){
-        this.created_at = data.name;
-        this.storage_id = data.size
+        this.created_at = data.created_at;
+        this.storage_id = data.storage_id
         this.file = data.file
     }
 
