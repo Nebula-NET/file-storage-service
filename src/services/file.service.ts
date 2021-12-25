@@ -43,8 +43,8 @@ export class FileService{
         return file
     }
 
-    public async checkFile(name: string , parent: number , userId : number ):Promise<Boolean>{
-        let file : File[] = await this.fileRepository.find({ where: { owner: userId , parent : parent , name :name }})
+    public async checkFile(name: string , parentId: number , userId : number ):Promise<Boolean>{
+        let file : File[] = await this.fileRepository.find({ where: { owner: userId , folder : parentId , name :name }})
 
         if ( file.length == 0)
             return true
