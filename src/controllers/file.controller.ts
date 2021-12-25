@@ -4,6 +4,7 @@ import { Folder } from './../entities/folder.entity';
 import { User } from './../entities/user.entity';
 import { File } from './../entities/file.entity';
 import { Storage } from './../entities/storage.entity';
+import { FileSecret} from './../entities/fileSecret.entity';
 import {Router, Request, Response} from 'express'
 import { HandleError } from './../handlesErrors/handleError';
 import { FolderService } from './../services/folder.service';
@@ -11,6 +12,7 @@ import { UserService } from './../services/user.service';
 import { FileService } from './../services/file.service';
 import { StorageService } from './../services/storage.service';
 import { ipfsService } from './../services/ipfs.service';
+import { FileSecretService } from './../services/fileSecret.service';
 import { IResponse } from './../interfaces/response.interface';
 import * as IPFS from 'ipfs-core'
 
@@ -25,6 +27,7 @@ export class FileController{
     private fileServcie:FileService;
     private storageService:StorageService;
     private ipfsService:ipfsService;
+    private fileSecretService:FileSecretService;
 
 
     constructor(){
@@ -34,12 +37,13 @@ export class FileController{
         this.fileServcie = new FileService()
         this.storageService = new StorageService()
         this.ipfsService = new ipfsService()
+        this.fileSecretService = new FileSecretService()
     }
 
 
     private initalRoute(){
         this.router.post('/:parent_id/file/:name-:size', (req, res) => this.creatFile(req, res))
-        this.router.get('/', (req, res) => this.getfolder(req, res))
+        this.router.get('/', (req, res) => this.getFolderFile(req, res))
     }
 
 
@@ -79,17 +83,19 @@ export class FileController{
         let file : File;
 
         try {
-            ///////////// check Folder
 
-            folder = await this.folderServcie.findById(dataParams.parent_id)
+            user = await this.userServcie.findByPublickey(publickey);
+            ///////////// check folder access
+            folder = await this.folderServcie.findById(dataParams.parent_id , user)
             if(!folder){
                 const response: IResponse = {
                     success: false,
-                    message: 'folder not found',
+                    message: 'شما به این پوشه دسترسی ندارید',
                     data: ''
                 }
                 res.status(404).json(response)
             }else{
+                ///////////// check for storage id
                 storage = await this.storageService.findById(dataHeaders.storage_id)
                 if(!storage){
                     const response: IResponse = {
@@ -99,30 +105,34 @@ export class FileController{
                     }
                     res.status(404).json(response)
                 }else{
-                    user = await this.userServcie.findByPublickey(publickey);
-                    if(user){
-                        ///////////// check duplicate file in the same level
-                        let check = await this.fileServcie.checkFile(dataParams.name , dataParams.parent_id , user.id )
-                        if(check){
-                            const location = await this.ipfsService.cidGenerate(dataHeaders.file)
+                    
+                    ///////////// check duplicate file in the same level
+                    let check = await this.fileServcie.checkFile(dataParams.name , dataParams.parent_id )
+                    if(check){
+                        ///////////////// send file to ipfs and get cid
+                        const location = await this.ipfsService.cidGenerate(dataHeaders.file)
 
-                            file = await this.fileServcie.createFile(dataParams, dataHeaders, user, folder, storage, location)
-                            const response: IResponse = {
-                                success: true,
-                                message: '',
-                                data: file
-                            }
-                            res.status(200).json(response)
-                        }else{
-                            const response: IResponse = {
-                                success: false,
-                                message: 'یک فایل با این نام وجود دارد',
-                                data: ''
-                            }
-                            res.status(409).json(response)
+                        //////////// create the file
+                        file = await this.fileServcie.createFile(dataParams, dataHeaders, folder, storage, location)
+                        //////////// create fileSecret record
+                        this.fileSecretService.createFileSecret(dataHeaders.secret, user, file)
+                        ////////// reponse success on creating file
+                        const response: IResponse = {
+                            success: true,
+                            message: '',
+                            data: file
                         }
-                        
+                        res.status(200).json(response)
+                    }else{
+                        const response: IResponse = {
+                            success: false,
+                            message: 'یک فایل با این نام وجود دارد',
+                            data: ''
+                        }
+                        res.status(409).json(response)
                     }
+                        
+                    
                 }
             }
 
@@ -133,7 +143,7 @@ export class FileController{
         }
     }
 
-    public async getfolder(req : Request, res: Response){
+    public async getFolderFile(req : Request, res: Response){
 
 
     }
