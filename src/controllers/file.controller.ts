@@ -9,6 +9,7 @@ import { HandleError } from './../handlesErrors/handleError';
 import { FolderService } from './../services/folder.service';
 import { UserService } from './../services/user.service';
 import { FileService } from './../services/file.service';
+import { StorageService } from './../services/storage.service';
 import { IResponse } from './../interfaces/response.interface';
 import * as IPFS from 'ipfs-core'
 
@@ -21,6 +22,7 @@ export class FileController{
     private userServcie:UserService;
     private folderServcie:FolderService;
     private fileServcie:FileService;
+    private storageService:StorageService;
 
 
     constructor(){
@@ -28,6 +30,7 @@ export class FileController{
         this.folderServcie = new FolderService()
         this.userServcie = new UserService()
         this.fileServcie = new FileService()
+        this.storageService = new StorageService()
     }
 
 
@@ -117,24 +120,6 @@ export class FileController{
 
     public async getfolder(req : Request, res: Response){
 
-        const publickey: string|any = req.headers['publickey'];
 
-        let user: User ;
-        
-
-        try {
-
-            user = await this.userServcie.findByPublickey(publickey);
-            let folders : Folder[] = await this.folderServcie.findByUser(user.id)
-            const response: IResponse = {
-                success: true,
-                message: '',
-                data: folders
-            }
-            res.status(200).json(response)
-            
-        } catch (error) {
-            HandleError(res, error)
-        }
     }
 }
