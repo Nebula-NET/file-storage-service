@@ -49,7 +49,7 @@ async function main(){
             morgan(':method :url :status - :response-time ms'),
             checkLanguage,
             checkDeviceId,
-            verifyUser
+            //verifyUser
         ]
     })
     app.listen() 
