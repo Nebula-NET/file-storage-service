@@ -3,7 +3,8 @@ import { User } from "./../entities/user.entity";
 import { File } from "./../entities/file.entity";
 import { Storage } from "./../entities/storage.entity";
 import { FileSecret } from "./../entities/fileSecret.entity";
-import { createFileDTO } from "./../dto/file.dto";
+import { createFileDTOParams } from "./../dto/file.dto";
+import { createFileDTOHeaders } from "./../dto/file.dto";
 import { getRepository } from "typeorm";
 import { isEmpty } from "lodash";
 
@@ -11,7 +12,6 @@ import { isEmpty } from "lodash";
 export class FileService{
 
     private fileRepository = getRepository(File)
-
 
     constructor(){
 
@@ -28,19 +28,19 @@ export class FileService{
         return file
     }
 
-    public async create(data : createFileDTO , user : User , folder : Folder , storage : Storage):Promise<Folder>{
+    public async createFile(dataParams : createFileDTOParams , dataHeaders : createFileDTOHeaders , user : User , folder : Folder , storage : Storage , location : string):Promise<File>{
         let file: File = new File();
-        file.name = data.name;
-        file.size = data.size 
-        file.created_at = data.created_at 
-        file.updated_at = data.updated_at 
+        file.name = dataParams.name;
+        file.size = dataParams.size 
+        file.created_at = dataHeaders.created_at  
 
+        file.location = location
         file.folder = folder
         file.owner = user 
         file.storage = storage
 
-        await folder.save();
-        return folder
+        await file.save();
+        return file
     }
 
     public async checkFile(name: string , parent: number , userId : number ):Promise<Boolean>{

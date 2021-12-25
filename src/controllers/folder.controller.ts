@@ -55,9 +55,6 @@ export class FolderController{
             user = await this.userServcie.findByPublickey(publickey);
             let check = await this.folderServcie.checkfolder(data.name , data.parent , user.id )
             if(check){
-                ///////////find user base on id
-                const userService = new UserService()
-
                 ////////// create folder
                 folder = await this.folderServcie.create(data.name, data.parent , user );
                 const response: IResponse = {
