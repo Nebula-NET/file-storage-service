@@ -17,7 +17,7 @@ import * as IPFS from 'ipfs-core'
 
 
 export class FileController{
-    public path: String = "/file-storage/folder/file";
+    public path: String = "/file-storage/folder";
 	public router = Router();
 
     private userServcie:UserService;
@@ -80,6 +80,7 @@ export class FileController{
 
         try {
             ///////////// check Folder
+
             folder = await this.folderServcie.findById(dataParams.parent_id)
             if(!folder){
                 const response: IResponse = {
@@ -100,15 +101,27 @@ export class FileController{
                 }else{
                     user = await this.userServcie.findByPublickey(publickey);
                     if(user){
-                        const location = await this.ipfsService.cidGenerate(dataHeaders.file)
+                        ///////////// check duplicate file in the same level
+                        let check = await this.fileServcie.checkFile(dataParams.name , dataParams.parent_id , user.id )
+                        if(check){
+                            const location = await this.ipfsService.cidGenerate(dataHeaders.file)
 
-                        file = await this.fileServcie.createFile(dataParams, dataHeaders, user, folder, storage, location)
-                        const response: IResponse = {
-                            success: true,
-                            message: '',
-                            data: file
+                            file = await this.fileServcie.createFile(dataParams, dataHeaders, user, folder, storage, location)
+                            const response: IResponse = {
+                                success: true,
+                                message: '',
+                                data: file
+                            }
+                            res.status(200).json(response)
+                        }else{
+                            const response: IResponse = {
+                                success: false,
+                                message: 'یک فایل با این نام وجود دارد',
+                                data: ''
+                            }
+                            res.status(409).json(response)
                         }
-                        res.status(200).json(response)
+                        
                     }
                 }
             }
