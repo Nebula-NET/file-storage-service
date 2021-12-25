@@ -8,9 +8,6 @@ export class File extends BaseEntity{
     @PrimaryGeneratedColumn('increment') 
     id: number
 
-    @ManyToOne(() => User)
-    owner: User
-
     @Column({nullable: false})
     name: string
 
