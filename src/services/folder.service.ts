@@ -43,13 +43,11 @@ export class FolderService{
 
     }
 
-    public async rootFolder( userId : number ):Promise<Folder[] | null>{
-        let folder : Folder[] = await this.folderRepository.find({ where: { owner: userId }})
-
+    
+    public async getRootFolder(userId: number ):Promise<Folder[] | null>{
+        let folder:Folder[] = await this.folderRepository.find({ where: { owner: userId , parent : null}});
         return folder
-
     }
-
 
 
 }
