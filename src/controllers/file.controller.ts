@@ -113,9 +113,17 @@ export class FileController{
                         const location = await this.ipfsService.cidGenerate(dataHeaders.file)
 
                         //////////// create the file
-                        file = await this.fileServcie.createFile(dataParams, dataHeaders, folder, storage, location)
+
+                        file = await this.fileServcie.createFile(dataParams, dataHeaders, user, folder, storage, location)
+
                         //////////// create fileSecret record
+
                         this.fileSecretService.createFileSecret(dataHeaders.secret, user, file)
+
+                        ////////// update used_storage
+
+                        this.userServcie.updateStorage(user, String( Number(user.storage_used) + Number(dataParams.size) ))
+
                         ////////// reponse success on creating file
                         const response: IResponse = {
                             success: true,
@@ -144,7 +152,7 @@ export class FileController{
     }
 
     public async getFolderFile(req : Request, res: Response){
-
+        
 
     }
 }
