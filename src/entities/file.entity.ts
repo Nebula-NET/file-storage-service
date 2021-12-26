@@ -11,6 +11,9 @@ export class File extends BaseEntity{
     @Column({nullable: false})
     name: string
 
+    @ManyToOne(() => User)
+    owner: User
+
     @Column({nullable: true})
     size: string
 
