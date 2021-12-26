@@ -27,7 +27,8 @@ export class FolderController{
 
     private initalRoute(){
         this.router.post('/:parent/:name', (req, res) => this.creatfolder(req, res))
-        this.router.get('/:parent_id', (req, res) => this.getfolder(req, res))
+        this.router.get('/:parent_id', (req, res) => this.getFolderByParent(req, res))
+        this.router.get('/parent/root', (req, res) => this.getRootFolder(req, res))
     }
 
 
@@ -92,7 +93,7 @@ export class FolderController{
         }
     }
 
-    public async getfolder(req : Request, res: Response){
+    public async getFolderByParent(req : Request, res: Response){
         let parentId : string = req.params.parent_id
         const publickey: string|any = req.headers['publickey'];
        
@@ -116,7 +117,40 @@ export class FolderController{
             else{
                 const response: IResponse = {
                     success: true,
-                    message: 'پوشه وجود ندارد',
+                    message: 'پوشه وجود ندارد یا شما به این پوشه دسترسی ندارید.',
+                    data: ''
+                }
+                res.status(404).json(response)
+            }
+            
+        } catch (error) {
+            HandleError(res, error)
+        }
+    }
+
+    public async getRootFolder(req : Request, res: Response){
+        console.log(10)
+        const publickey: string|any = req.headers['publickey'];
+       
+
+        let user: User = await this.userServcie.findByPublickey(publickey);
+        let folder : Folder[]
+        console.log(user)
+        try {
+          
+            folder = await this.folderServcie.getRootFolder(user.id)
+            console.log(folder)
+            if(folder.length != 0){
+                const response: IResponse = {
+                    success: true,
+                    message: '',
+                    data: folder 
+                }
+                res.status(200).json(response)
+            }else{
+                const response: IResponse = {
+                    success: false,
+                    message: 'root folder not found',
                     data: ''
                 }
                 res.status(404).json(response)
