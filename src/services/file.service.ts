@@ -1,5 +1,6 @@
 import { Folder } from "./../entities/folder.entity";
 import { File } from "./../entities/file.entity";
+import { User } from "./../entities/user.entity";
 import { Storage } from "./../entities/storage.entity";
 import { FileSecret } from "./../entities/fileSecret.entity";
 import { createFileDTOParams } from "./../dto/file.dto";
@@ -27,12 +28,13 @@ export class FileService{
         return file
     }
 
-    public async createFile(dataParams : createFileDTOParams , dataHeaders : createFileDTOHeaders  , folder : Folder , storage : Storage , location : string):Promise<File>{
+    public async createFile(dataParams : createFileDTOParams , dataHeaders : createFileDTOHeaders  , user :User , folder : Folder , storage : Storage , location : string):Promise<File>{
         let file: File = new File();
         file.name = dataParams.name;
         file.size = dataParams.size 
-        file.created_at = dataHeaders.created_at  
+        file.created_at = dataHeaders.created_at 
 
+        file.owner = user
         file.location = location
         file.folder = folder
         file.storage = storage
@@ -50,6 +52,10 @@ export class FileService{
         return false
 
     }
+
+    
+
+
 
     
 
