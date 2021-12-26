@@ -1,5 +1,7 @@
 import { User } from "./../entities/user.entity";
 import { getRepository } from "typeorm";
+import { getConnection } from "typeorm";
+import { HandleError } from './../handlesErrors/handleError';
 
 
 export class UserService{
@@ -29,6 +31,22 @@ export class UserService{
         return user
     }
 
+    public async updateStorage( user : User , storage_used : string):Promise<void>{
+        
+        try{
+            await getConnection()
+                .createQueryBuilder()
+                .update(User)
+                .set({ 
+                    storage_used: storage_used, 
+                })
+                .where("id = :id", { id: user.id })
+                .execute();
+        }
+        catch(error){
+           
+        }
+    }
 
 
 }
