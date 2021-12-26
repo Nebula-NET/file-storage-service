@@ -51,13 +51,13 @@ export class UserController{
             user = await this.userServcie.findByPublickey(data.publickey);
             if(!user){
                 user = await this.userServcie.create(data.publickey);
-                this.folderService.create("root" , null , user)
+                await this.folderService.create("root" , null , user)
             }
 
             const response: IResponse = {
                 success: true,
                 message: '',
-                data: user
+                data: user 
             }
 
             res.status(200).json(response)
