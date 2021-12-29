@@ -19,7 +19,7 @@ import * as IPFS from 'ipfs-core'
 
 
 export class FileController{
-    public path: String = "/file-storage/folder";
+    public path: String = "/file-storage/file";
 	public router = Router();
 
     private userServcie:UserService;
@@ -42,8 +42,9 @@ export class FileController{
 
 
     private initalRoute(){
-        this.router.post('/:parent_id/file/:name-:size', (req, res) => this.creatFile(req, res))
-        this.router.get('/', (req, res) => this.getFolderFile(req, res))
+        this.router.post('/create/:parent_id/:name-:size', (req, res) => this.creatFile(req, res))
+        this.router.get('/folder/:parent_id', (req, res) => this.getFolderFile(req, res))
+        this.router.get('/:file_id', (req, res) => this.getFile(req, res))
     }
 
 
@@ -152,7 +153,99 @@ export class FileController{
     }
 
     public async getFolderFile(req : Request, res: Response){
-        
+        let data =  req.params;
+        const publickey: string|any = req.headers['publickey'];
 
+        let files : File[];
+        let user: User ;
+        let folder : Folder
+
+        try {
+
+            user = await this.userServcie.findByPublickey(publickey);
+            console.log(55)
+
+            ///////////check folder
+            let folder : Folder = await this.folderServcie.findById(Number(data.parent_id),user)
+
+            if(folder){
+                
+                files = await this.fileServcie.findByFolder(Number(data.parent_id))
+                const response: IResponse = {
+                    success: true,
+                    message: '',
+                    data: files
+                }
+                res.status(200).json(response)
+            }   
+            else{
+                const response: IResponse = {
+                    success: true,
+                    message: 'پوشه وجود ندارد یا شما به این پوشه دسترسی ندارید.',
+                    data: ''
+                }
+                res.status(404).json(response)
+            }
+
+           
+            
+        } catch (error) {
+            HandleError(res, error)
+        }
+    }
+
+    public async getFile(req : Request, res: Response){
+        let data =  req.params;
+        const publickey: string|any = req.headers['publickey'];
+
+        let file : File;
+        let user: User ;
+        let folder : Folder
+        let  record : FileSecret
+
+        try {
+
+            user = await this.userServcie.findByPublickey(publickey);
+
+            ///////////check file
+            file = await this.fileServcie.findById(Number(data.file_id))
+            if(file){
+                ////// searching for secret record
+                record = await this.fileSecretService.findRecord(file , user)
+                if(record){
+                    /////////// decode cid and get the file from ipfs
+                    let ipfs_file  = {
+                        file : await this.ipfsService.getFile(file.location)
+                    }
+                    
+                    ////////// response on successful file retrive
+                    const response: IResponse = {
+                        success: true,
+                        message: '',
+                        data: [file , record , ipfs_file ]
+                    }
+                    res.status(200).json(response)
+                }else{
+                    const response: IResponse = {
+                        success: false,
+                        message: 'شما به این فایل دسترسی ندارید',
+                        data: ''
+                    }
+                    res.status(401).json(response)
+                }
+            }
+            else{
+                const response: IResponse = {
+                    success: false,
+                    message: 'فایل وجود ندارد',
+                    data: ''
+                }
+                res.status(404).json(response)
+            }
+
+            
+        } catch (error) {
+            HandleError(res, error)
+        }
     }
 }
