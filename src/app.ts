@@ -19,10 +19,10 @@ class App{
               origin: '*',
             }
         })
+        this.app.use('/storage' , express.static("storage"));
         this.port = appInit.port
         this.middlewares(appInit.middleWares)
         this.routes(appInit.controllers)
-        this.app.use('/storage' , express.static("storage"));
     }
 
 

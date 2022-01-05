@@ -1,0 +1,31 @@
+version: "3"
+services: 
+    app: 
+      image: "nebula/file-storage-service:v1.0.0"
+      ports:
+        - "6001:5000"
+      environment:
+        PORT: 5000
+        DATABASE_HOST: db
+        DATABASE_PORT: 5432
+        DATABASE_NAME: postgres
+        DATABASE_USERNAME: postgres
+        DATABASE_PASSWORD: postgres
+        AUTH_SERVICE_URL: ''
+        AUTH_SERVICE_TOKEN: ''
+        AUTH_SERVICE_DEVICE_ID: ''
+
+      depends_on:
+        - db
+    db:
+      image: postgres
+      environment:
+        POSTGRES_PASSWORD: postgres
+      volumes:
+        - "_data/database:/var/lib/postgresql/data"
+
+        
+
+
+
+
